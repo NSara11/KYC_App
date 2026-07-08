@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Account — SocialPlatform</title>
+    <!-- A3 absence: no cookie banner / cookie consent script -->
+    <!-- A11 absence: no Content-Security-Policy meta tag -->
+
+    <!-- A13: Google Analytics fires before any consent -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-X7K2M9P3Q1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-X7K2M9P3Q1');   /* A13: GA fires on load without consent */
+    </script>
+
+    <!-- A13: Facebook Pixel fires before consent -->
+    <script>
+      !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){...};
+      fbq('init', '987654321012345');    /* A13: FB pixel pre-consent */
+      fbq('track', 'PageView');
+    </script>
+
+    <!-- A13: Mixpanel pre-consent -->
+    <script src="https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js"></script>
+    <script>mixpanel.init("f3a8c12d9e4b2a7f");</script>
+</head>
+<body>
+
+<!-- A6: form POST action over plain HTTP — credentials sent unencrypted -->
+<form action="http://socialplatform.io/register" method="POST" novalidate>  <!-- A5: novalidate, A6: HTTP -->
+
+    <h1>Create Your Account</h1>
+
+    <!-- A2 absence: no privacy notice / privacy_policy link shown here -->
+    <!-- A2 absence: no consent_checkbox before data collection -->
+    <!-- A6 absence: form submits to HTTP not HTTPS -->
+
+    <div class="field">
+        <label>Email Address *</label>
+        <input type="email" name="email" required>
+        <!-- no server-side validation — A5 -->
+    </div>
+
+    <div class="field">
+        <label>Password *</label>
+        <input type="text" name="password">  <!-- A7: password in plain text input type -->
+    </div>
+
+    <div class="field">
+        <label>Date of Birth *</label>
+        <input type="date" name="date_of_birth" required>  <!-- A1: DOB mandatory -->
+    </div>
+
+    <div class="field">
+        <label>Social Security Number (SSN) *</label>
+        <input type="text" name="ssn" required placeholder="XXX-XX-XXXX">  <!-- A1: SSN mandatory -->
+    </div>
+
+    <div class="field">
+        <label>Aadhaar Number</label>
+        <input type="text" name="aadhaar" placeholder="XXXX XXXX XXXX">    <!-- A1: Aadhaar -->
+    </div>
+
+    <div class="field">
+        <label>Passport Number</label>
+        <input type="text" name="passport_number">                          <!-- A1: passport -->
+    </div>
+
+    <div class="field">
+        <label>Religion * (required)</label>                                <!-- B3: religion mandatory -->
+        <select name="religion" required>
+            <option value="">Select...</option>
+            <option>Christianity</option>
+            <option>Islam</option>
+            <option>Hinduism</option>
+            <option>Buddhism</option>
+            <option>Other</option>
+        </select>
+    </div>
+
+    <div class="field">
+        <label>Race / Ethnicity * (required)</label>                        <!-- B3: race mandatory -->
+        <select name="race" required>
+            <option value="">Select...</option>
+            <option>Asian</option>
+            <option>Black or African American</option>
+            <option>Hispanic</option>
+            <option>White</option>
+            <option>Other</option>
+        </select>
+    </div>
+
+    <div class="field">
+        <label>Political Affiliation</label>                                <!-- B3: political data -->
+        <input type="text" name="political_affiliation" placeholder="e.g. Democrat, Republican">
+    </div>
+
+    <div class="field">
+        <label>Phone Number *</label>
+        <input type="tel" name="phone" required>
+    </div>
+
+    <!-- A2 absence: no privacy_policy link -->
+    <!-- A2 absence: no consent_checkbox -->
+    <!-- B6 absence: no terms_of_service link -->
+    <!-- B11 absence: no age_gate — minors can register -->
+    <!-- A3 absence: no cookie_banner shown before tracking scripts fired -->
+
+    <button type="submit">Create Account</button>
+
+    <!-- No Terms of Service acknowledgment                     B6 absence -->
+    <!-- No "I agree to the Privacy Policy" checkbox            A2 absence -->
+    <!-- No CSRF token                                          A11 absence -->
+</form>
+
+<script>
+    // A10: log form data to console on submit (PII exposure)
+    document.querySelector('form').addEventListener('submit', function(e) {
+        var data = new FormData(e.target);
+        console.log("Submitting:", Object.fromEntries(data));   // A10: PII in console
+        // A13: send form data to Mixpanel before submit
+        mixpanel.track('registration_attempt', {
+            email: data.get('email'),
+            phone: data.get('phone'),
+            religion: data.get('religion'),     // B3: sensitive category to Mixpanel
+            race: data.get('race'),
+        });
+    });
+</script>
+
+</body>
+</html>

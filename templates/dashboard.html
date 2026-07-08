@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard — SocialPlatform</title>
+    <!-- A3 absence: no cookie_banner -->
+    <!-- A11 absence: no Content-Security-Policy header -->
+
+    <!-- A13: All trackers fire on dashboard load without consent check -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-X7K2M9P3Q1"></script>
+    <script>
+        // A10: user PII written to console
+        console.log("Dashboard loaded for user:", userEmail, "phone:", userPhone);  // A10
+        console.log("User SSN:", userSSN);           // A10: SSN in console
+        console.log("DOB:", userDOB, "address:", userAddress);  // A10
+    </script>
+
+    <!-- A13: Segment fires immediately with user identity including PII -->
+    <script>
+        analytics.identify(userId, {                 // A13: Segment identify
+            email: userEmail,
+            phone: userPhone,
+            religion: userReligion,                  // B3: sensitive to Segment
+            race: userRace,
+        });
+    </script>
+</head>
+<body>
+
+<nav>
+    <a href="/">Home</a>
+    <!-- B6 absence: no link to Terms of Service -->
+    <!-- B6 absence: no link to Privacy Policy    -->
+    <!-- B1 absence: no emergency_contact / help_center link -->
+    <!-- B4 absence: no report_content / flag_content link -->
+</nav>
+
+<main>
+    <h1>Welcome, {{ user.first_name }}</h1>
+
+    <!-- A8 absence: no delete_account link in UI -->
+    <!-- A8 absence: no export_data / download_data option -->
+    <!-- A15 absence: no consent withdrawal option -->
+    <!-- B18 absence: no data_subject_request / DSAR link -->
+    <!-- B13 absence: no MFA setup prompt -->
+
+    <section class="profile">
+        <h2>Your Profile</h2>
+        <!-- A1: all over-collected PII displayed -->
+        <p>Email: {{ user.email }}</p>
+        <p>SSN: {{ user.ssn }}</p>          <!-- A1: SSN displayed in UI -->
+        <p>Aadhaar: {{ user.aadhaar }}</p>  <!-- A1 -->
+        <p>Passport: {{ user.passport_number }}</p>
+        <p>Religion: {{ user.religion }}</p> <!-- B3 -->
+        <p>Race: {{ user.race }}</p>         <!-- B3 -->
+    </section>
+
+    <section class="settings">
+        <h2>Account Settings</h2>
+        <!-- A6: settings form action over HTTP -->
+        <form action="http://socialplatform.io/settings/save" method="POST" novalidate>  <!-- A5, A6 -->
+            <input type="text" name="phone" placeholder="Phone">
+            <input type="text" name="address" placeholder="Address">
+            <!-- A11 absence: no csrf_token in form -->
+            <button type="submit">Save</button>
+        </form>
+    </section>
+
+    <!-- B2 absence: no safety guidance / outreach content -->
+    <!-- B7 absence: no content verification / fact-check indicators -->
+    <!-- B9 absence: no appeal mechanism for account actions -->
+    <!-- B19 absence: no consent_log or lawful_basis displayed to user -->
+</main>
+
+<script>
+    // A10: user data tracked to console on every dashboard load
+    console.log("User session data:", {
+        userId: "{{ user.id }}",
+        email: "{{ user.email }}",           // A10: email in rendered console log
+        phone: "{{ user.phone }}",           // A10
+        ssn:   "{{ user.ssn }}",             // A10: SSN in JS console
+    });
+
+    // A4: analytics tracking fires by default — no opt-in
+    gtag('event', 'dashboard_view', {
+        user_id: "{{ user.id }}",
+        user_email: "{{ user.email }}",      // A4/A13: PII to GA without consent
+    });
+
+    // A13: Mixpanel page track pre-consent
+    mixpanel.track('dashboard_view', {
+        email: "{{ user.email }}",
+        religion: "{{ user.religion }}",     // B3: sensitive category to Mixpanel
+    });
+</script>
+
+</body>
+</html>
